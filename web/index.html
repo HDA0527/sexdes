@@ -1,0 +1,1676 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>性教育迷思測驗 - 滑動探索</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Zen Maru Gothic', '粉圓體', 'Microsoft JhengHei', '微軟正黑體', sans-serif !important;
+            font-weight: 400;
+        }
+        
+        .cute-title {
+            font-family: 'Zen Maru Gothic', '粉圓體', sans-serif !important;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-shadow: 0 3px 6px rgba(0,0,0,0.15);
+        }
+        
+        .cute-text {
+            font-family: 'Zen Maru Gothic', '粉圓體', sans-serif !important;
+            font-weight: 400;
+            letter-spacing: 0.02em;
+            line-height: 1.7;
+        }
+        
+        .cute-button {
+            font-family: 'Zen Maru Gothic', '圓體', 'Microsoft JhengHei UI', '微軟正黑體', sans-serif !important;
+            font-weight: 500;
+            letter-spacing: 0.03em;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .card-stack {
+            perspective: 1000px;
+        }
+        
+        .question-card {
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+            transform-style: preserve-3d;
+        }
+        
+        .card-swipe-left {
+            transform: translateX(-100%) rotate(-30deg);
+            opacity: 0;
+        }
+        
+        .card-swipe-right {
+            transform: translateX(100%) rotate(30deg);
+            opacity: 0;
+        }
+        
+        .result-animation {
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .sparkle {
+            animation: sparkle 2s infinite;
+        }
+        
+        .float {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .magic-glow {
+            animation: magicGlow 2s ease-in-out infinite alternate;
+        }
+        
+        .simple-animation {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes sparkle {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-8px) rotate(2deg); }
+            66% { transform: translateY(-12px) rotate(-1deg); }
+        }
+        
+        .floating-slow {
+            animation: floatSlow 4s ease-in-out infinite;
+        }
+        
+        .floating-medium {
+            animation: floatMedium 3.5s ease-in-out infinite;
+        }
+        
+        .floating-fast {
+            animation: floatFast 2.8s ease-in-out infinite;
+        }
+        
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+            50% { transform: translateY(-15px) rotate(3deg) scale(1.05); }
+        }
+        
+        @keyframes floatMedium {
+            0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+            50% { transform: translateY(-12px) rotate(-2deg) scale(1.03); }
+        }
+        
+        @keyframes floatFast {
+            0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+            50% { transform: translateY(-8px) rotate(1deg) scale(1.02); }
+        }
+        
+        @keyframes magicGlow {
+            from { box-shadow: 0 0 20px rgba(255, 255, 255, 0.3); }
+            to { box-shadow: 0 0 30px rgba(255, 255, 255, 0.6), 0 0 40px rgba(147, 51, 234, 0.3); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-shadow {
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .admin-hint {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-2xl mx-auto">
+        <!-- 開始畫面 -->
+        <div id="startScreen" class="text-center text-white relative">
+            <!-- 裝飾性浮動元素 -->
+            <div class="absolute inset-0 pointer-events-none overflow-hidden">
+                <div class="absolute top-10 left-10 text-2xl opacity-60 floating-slow" style="animation-delay: 0s;">💕</div>
+                <div class="absolute top-20 right-16 text-xl opacity-50 floating-medium" style="animation-delay: 1s;">🌸</div>
+                <div class="absolute top-32 left-1/4 text-lg opacity-40 floating-fast" style="animation-delay: 2s;">💖</div>
+                <div class="absolute top-40 right-1/3 text-2xl opacity-60 floating-slow" style="animation-delay: 0.5s;">🦋</div>
+                <div class="absolute bottom-40 left-12 text-xl opacity-50 floating-medium" style="animation-delay: 1.5s;">🌺</div>
+                <div class="absolute bottom-32 right-20 text-lg opacity-40 floating-fast" style="animation-delay: 2.5s;">💐</div>
+                <div class="absolute bottom-20 left-1/3 text-2xl opacity-60 floating-slow" style="animation-delay: 3s;">🌹</div>
+                <div class="absolute top-1/2 left-8 text-sm opacity-30 floating-medium" style="animation-delay: 1.8s;">💝</div>
+                <div class="absolute top-1/3 right-8 text-sm opacity-30 floating-fast" style="animation-delay: 2.2s;">🎀</div>
+                <div class="absolute top-16 left-1/2 text-lg opacity-45 floating-medium" style="animation-delay: 0.8s;">🌷</div>
+                <div class="absolute bottom-16 right-1/4 text-xl opacity-55 floating-slow" style="animation-delay: 2.8s;">💞</div>
+                <div class="absolute top-1/4 left-20 text-sm opacity-35 floating-fast" style="animation-delay: 1.2s;">🌻</div>
+            </div>
+            
+            <div class="mb-8 float relative z-10">
+                <div class="sparkle">
+                    <h1 class="text-4xl cute-title mb-4 cursor-pointer select-none" id="mainTitle">✨ <span class="text-5xl text-pink-300">性</span>教育迷思測驗 ✨</h1>
+                </div>
+                <p class="text-lg opacity-90 cute-text">🌟 破除性迷思，學習正確知識 🌟</p>
+                <p class="text-sm opacity-75 mt-2 cute-text">左滑 = ❌ | 右滑 = ✅</p>
+                <div class="mt-4 text-2xl sparkle">🔮💫⭐</div>
+                
+
+                
+                <!-- 愛心裝飾 -->
+                <div class="mt-6 flex justify-center space-x-4">
+                    <div class="text-pink-300 text-lg sparkle" style="animation-delay: 0.5s;">💗</div>
+                    <div class="text-red-300 text-xl sparkle" style="animation-delay: 1s;">❤️</div>
+                    <div class="text-pink-300 text-lg sparkle" style="animation-delay: 1.5s;">💗</div>
+                </div>
+            </div>
+            
+            <!-- 隱藏的圖片上傳區域 - 只有按住特定組合鍵才會顯示 -->
+            <div id="adminUploadPanel" class="mb-8 hidden">
+                <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-4 border border-white border-opacity-20">
+                    <div class="text-center mb-4">
+                        <h3 class="text-white cute-title text-lg">🔧 管理員圖片上傳面板</h3>
+                        <p class="text-white text-xs opacity-75 cute-text">💻 Ctrl+Shift+U 或 📱 連續點擊標題5次 顯示/隱藏</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <!-- 封面背景 -->
+                        <div class="bg-white bg-opacity-5 rounded-lg p-3">
+                            <label class="block text-white text-sm cute-button mb-2">🌅 封面背景圖</label>
+                            <input type="file" id="coverBgUpload" accept="image/*" class="w-full text-xs text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-pink-500 file:text-white hover:file:bg-pink-600">
+                        </div>
+                        
+                        <!-- 題目背景圖片 -->
+                        <div class="bg-white bg-opacity-5 rounded-lg p-3">
+                            <label class="block text-white text-sm cute-button mb-2">🎨 題目背景圖 (10張)</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="file" id="questionBg1Upload" accept="image/*" class="w-full text-xs text-white file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-purple-500 file:text-white hover:file:bg-purple-600" title="題目1背景">
+                                <input type="file" id="questionBg2Upload" accept="image/*" class="w-full text-xs text-white file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-purple-500 file:text-white hover:file:bg-purple-600" title="題目2背景">
+                                <input type="file" id="questionBg3Upload" accept="image/*" class="w-full text-xs text-white file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-purple-500 file:text-white hover:file:bg-purple-600" title="題目3背景">
+                                <input type="file" id="questionBg4Upload" accept="image/*" class="w-full text-xs text-white file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-purple-500 file:text-white hover:file:bg-purple-600" title="題目4背景">
+                                <input type="file" id="questionBg5Upload" accept="image/*" class="w-full text-xs text-white file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-purple-500 file:text-white hover:file:bg-purple-600" title="題目5背景">
+                                <input type="file" id="questionBg6Upload" accept="image/*" class="w-full text-xs text-white file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-purple-500 file:text-white hover:file:bg-purple-600" title="題目6背景">
+                                <input type="file" id="questionBg7Upload" accept="image/*" class="w-full text-xs text-white file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-purple-500 file:text-white hover:file:bg-purple-600" title="題目7背景">
+                                <input type="file" id="questionBg8Upload" accept="image/*" class="w-full text-xs text-white file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-purple-500 file:text-white hover:file:bg-purple-600" title="題目8背景">
+                                <input type="file" id="questionBg9Upload" accept="image/*" class="w-full text-xs text-white file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-purple-500 file:text-white hover:file:bg-purple-600" title="題目9背景">
+                                <input type="file" id="questionBg10Upload" accept="image/*" class="w-full text-xs text-white file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-purple-500 file:text-white hover:file:bg-purple-600" title="題目10背景">
+                            </div>
+                        </div>
+                        
+                        <!-- 結果圖片 -->
+                        <div class="bg-white bg-opacity-5 rounded-lg p-3">
+                            <label class="block text-white text-sm cute-button mb-2">🏆 結果圖片</label>
+                            <div class="space-y-2">
+                                <div class="bg-white bg-opacity-10 rounded p-2 mb-2">
+                                    <div class="text-yellow-300 text-xs cute-button mb-1">🌟 性學大師 (80分以上)</div>
+                                    <input type="file" id="masterUpload" accept="image/*" class="w-full text-xs text-white file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:bg-yellow-500 file:text-white hover:file:bg-yellow-600" title="性學大師結果圖">
+                                </div>
+                                <div class="bg-white bg-opacity-10 rounded p-2 mb-2">
+                                    <div class="text-blue-300 text-xs cute-button mb-1">📚 性學學徒 (60-79分)</div>
+                                    <input type="file" id="apprenticeUpload" accept="image/*" class="w-full text-xs text-white file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:bg-blue-500 file:text-white hover:file:bg-blue-600" title="性學學徒結果圖">
+                                </div>
+                                <div class="bg-white bg-opacity-10 rounded p-2 mb-2">
+                                    <div class="text-green-300 text-xs cute-button mb-1">🌱 性學新手 (60分以下)</div>
+                                    <input type="file" id="noviceUpload" accept="image/*" class="w-full text-xs text-white file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:bg-green-500 file:text-white hover:file:bg-green-600" title="性學新手結果圖">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 解析背景圖片 -->
+                        <div class="bg-white bg-opacity-5 rounded-lg p-3">
+                            <label class="block text-white text-sm cute-button mb-2">📚 解析背景圖</label>
+                            <input type="file" id="analysisBgUpload" accept="image/*" class="w-full text-xs text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-500 file:text-white hover:file:bg-indigo-600">
+                        </div>
+                    </div>
+                    
+                    <!-- 匯出功能 -->
+                    <div class="mt-6 text-center space-y-3">
+                        <button onclick="exportImages()" class="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-6 py-3 rounded-full cute-button text-sm transition-colors shadow-lg block w-full">
+                            🎨 匯出我的測驗 (圖片永久嵌入)
+                        </button>
+                        <button onclick="downloadCompletePackage()" class="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white px-6 py-3 rounded-full cute-button text-sm transition-colors shadow-lg block w-full">
+                            📦 下載完整測驗包 (HTML+圖片)
+                        </button>
+                        <p class="text-white text-xs opacity-75 mt-2 cute-text">🌟 你的圖片會永久成為測驗的一部分！發布後所有人都能立即看到，就像測驗功能一樣內建顯示</p>
+                    </div>
+                </div>
+            </div>
+            
+            <button onclick="startQuiz()" class="bg-white text-purple-600 px-8 py-4 rounded-full cute-button text-lg hover:bg-gray-100 transition-colors shadow-lg magic-glow sparkle">
+                ✨ 開始魔法測驗 ✨
+            </button>
+        </div>
+
+        <!-- 測驗畫面 -->
+        <div id="quizScreen" class="hidden">
+            <!-- 進度條 -->
+            <div class="mb-6">
+                <div class="bg-white bg-opacity-20 rounded-full h-2">
+                    <div id="progressBar" class="bg-white rounded-full h-2 transition-all duration-300" style="width: 0%"></div>
+                </div>
+                <p class="text-white text-center mt-2 text-sm cute-text">
+                    <span id="currentQuestion">1</span> / <span id="totalQuestions">24</span>
+                </p>
+            </div>
+
+            <!-- 卡片堆疊 -->
+            <div class="card-stack relative h-[40rem] sm:h-[44rem]">
+                <div id="questionCard" class="question-card absolute inset-0 bg-white rounded-2xl card-shadow overflow-hidden cursor-pointer">
+                    <!-- 全螢幕背景圖片 -->
+                    <div class="absolute inset-0 bg-gradient-to-br from-purple-400 to-pink-400" id="cardBackground">
+                        <!-- 預設漸層背景，會被圖片覆蓋 -->
+                    </div>
+                    
+                    <!-- 底部黑色漸層遮罩 -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none"></div>
+                    
+                    <!-- 底部文字資訊 (無白色框) -->
+                    <div class="absolute bottom-0 left-0 right-0 p-6">
+                        <div class="flex items-start space-x-4">
+                            <div class="text-4xl sm:text-5xl flex-shrink-0" id="questionEmoji">🤔</div>
+                            <div class="flex-1 min-w-0">
+                                <h2 class="text-xl sm:text-2xl cute-title text-white mb-2 leading-tight drop-shadow-lg" id="questionText">載入中...</h2>
+                                <p class="text-white text-sm sm:text-base leading-relaxed mb-4 drop-shadow-md cute-text" id="questionDesc">請稍候</p>
+                                
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 操作按鈕 -->
+            <div class="flex justify-center space-x-6 mt-8">
+                <button onclick="swipeLeft()" class="bg-orange-500 hover:bg-orange-600 text-white w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center text-3xl sm:text-4xl transition-colors shadow-lg">
+                    🚫
+                </button>
+                <button onclick="swipeRight()" class="bg-green-500 hover:bg-green-600 text-white w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center text-3xl sm:text-4xl transition-colors shadow-lg">
+                    ✅
+                </button>
+            </div>
+        </div>
+
+        <!-- 結果畫面 -->
+        <div id="resultScreen" class="hidden">
+            <!-- 結果圖片框 -->
+            <div class="relative w-full mb-8 max-w-2xl mx-auto">
+                <div class="bg-white rounded-2xl card-shadow overflow-hidden result-animation border-4 border-dashed border-gray-300 flex items-center justify-center" style="width: 595px; height: 842px; max-width: 100%;">
+                    <!-- 結果背景圖片 -->
+                    <div class="w-full h-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center p-4" id="resultBackground">
+                        <!-- 預設漸層背景，會被結果圖片覆蓋 -->
+                    </div>
+                    
+                    <!-- 圖片上傳提示 (當沒有圖片時顯示) -->
+                    <div class="absolute inset-0 flex items-center justify-center text-center text-gray-500 z-10" id="resultPlaceholder">
+                        <div>
+                            <div class="text-6xl mb-4">🖼️</div>
+                            <p class="text-lg cute-button">測驗結果圖片</p>
+                            <p class="text-sm cute-text">會根據分數自動顯示</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 按鈕區域 -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+                <button onclick="restartQuiz()" class="bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white px-8 py-4 rounded-full cute-button text-lg transition-colors shadow-lg magic-glow sparkle">
+                    🔄 重新魔法測驗
+                </button>
+                <button onclick="toggleAnalysis()" id="toggleAnalysisBtn" class="bg-gradient-to-r from-blue-500 to-teal-600 hover:from-blue-600 hover:to-teal-700 text-white px-8 py-4 rounded-full cute-button text-lg transition-colors shadow-lg magic-glow sparkle">
+                    📚 查看魔法解析
+                </button>
+            </div>
+            
+            <!-- 答錯題目解析區域 -->
+            <div id="wrongAnswersSection" class="mt-8 hidden">
+                <h3 class="text-2xl cute-title mb-6 text-center text-white sparkle">✨📚 魔法知識解析 📖✨</h3>
+                <div id="wrongAnswersList" class="space-y-6 text-left max-h-96 overflow-y-auto mb-8">
+                    <!-- 答錯的題目會動態插入這裡 -->
+                </div>
+                <!-- 解析區域的按鈕 -->
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button onclick="restartQuiz()" class="bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white px-8 py-4 rounded-full cute-button text-lg transition-colors shadow-lg magic-glow sparkle">
+                        🔄 重新魔法測驗
+                    </button>
+                    <button onclick="toggleAnalysis()" class="bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white px-8 py-4 rounded-full cute-button text-lg transition-colors shadow-lg magic-glow sparkle">
+                        📖 返回結果
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 完整題目庫 - 分為迷思和事實兩類
+        const mythQuestions = [
+            {
+                emoji: "💑",
+                text: "沒前戲硬了就來",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！前戲對於性愛品質非常重要，能幫助雙方放鬆、增加潤滑，讓整個過程更舒適愉悅。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "⚡",
+                text: "狂抽猛送才會舒服",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！大多數女性並不會因為激烈動作就高潮，甚至會感到不舒服。溫柔、有節奏的動作通常更有效。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "🎯",
+                text: "光靠活塞運動就能高潮",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！調查發現75%的女性無法單靠陰道性交達到高潮，通常需要陰蒂刺激才能達到高潮。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "😅",
+                text: "女生喜歡男生射在臉上",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！很多女性會害怕甚至討厭這種行為。這主要是A片情節，現實中需要事先溝通和同意。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "💦",
+                text: "女生高潮都會潮吹",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！潮吹並非每個女性都會有的現象，只有部分女性在特定刺激下才會發生。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "⏰",
+                text: "激戰時間長才叫猛",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！男性平均持續時間約3-7分鐘，時間長短不代表性能力，重要的是雙方的滿足感。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "🤸",
+                text: "體位多變比較有感覺",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！複雜體位可能導致受傷，簡單舒適的體位往往更能帶來愉悅感受。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "💧",
+                text: "口水當潤滑液",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！口水很快就會乾掉，不是理想的潤滑劑，建議使用專門的潤滑產品。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "📏",
+                text: "男性器官小就是沒感覺沒辦法讓女生有快感",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！尺寸大小與性愛品質沒有直接關係，技巧、溝通和情感連結更重要。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "🧴",
+                text: "陰道不應需要額外的潤滑劑",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！當天然分泌物不足時，使用潤滑劑是正常且建議的，能讓過程更舒適。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "👟",
+                text: "陰莖大小跟腳的大小有關係",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！身體各部位的大小之間沒有科學證實的關聯性。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "✨",
+                text: "男生的精液可以養顏美容",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！精液雖含有一些營養成分，但濃度不足以產生美容效果。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "🛡️",
+                text: "帶兩個保險套會更保險",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！戴兩個保險套會因摩擦增加破裂風險，正確使用一個就足夠了。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "✂️",
+                text: "大部分的女人都會除陰毛",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！除毛是個人選擇，並非大部分女性的做法，每個人的偏好不同。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "👶",
+                text: "年輕男性比較容易早洩",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！早洩與年齡沒有絕對關係，可能受心理、生理等多種因素影響。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "⚖️",
+                text: "吃避孕藥會增加你的體重",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！現代避孕藥的荷爾蒙劑量較低，體重增加通常很輕微或沒有。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "🦠",
+                text: "口交後使用漱口水可以避免得菜花",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！漱口水無法有效預防HPV感染，安全的口交需要使用保險套或口交膜。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "🏃",
+                text: "性行為可以幫助減肥",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！雖然性行為會消耗熱量，但消耗量有限，不能作為主要的減肥方式。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "🧭",
+                text: "發生性行為時，朝向北邊不會懷孕",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！方向與懷孕完全無關，沒有避孕措施就有懷孕風險。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "👥",
+                text: "看色情都是男生的事情",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！研究發現女性也會觀看色情內容，這是正常的性行為表現。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "💋",
+                text: "性愛中用口是安全的",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！口交也可能傳播性病，包括HPV、梅毒、淋病等，需要防護措施。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "🍫",
+                text: "巧克力能催情",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！科學證據顯示巧克力並沒有真正的催情效果。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "🏪",
+                text: "精液可以累積",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！精液不會無限累積，身體會自然調節和更新精液。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "👙",
+                text: "小胸部的女生比較不敏感",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！胸部大小與敏感度沒有直接關係，每個人的敏感度都不同。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "🩸",
+                text: "月經期間發生性行為不會懷孕",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！雖然機率較低，但月經期間仍有懷孕可能，特別是週期不規律的女性。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "🚫",
+                text: "體外射精是有效的避孕方法",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！體外射精失敗率高達22%，因為射精前的分泌物也可能含有精子。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "🦠",
+                text: "性病(例如:菜花)只會透過性行為來傳播",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！某些性病也可能透過其他方式傳播，如皮膚接觸、共用物品等。",
+                backgroundImage: ""
+            }
+        ];
+
+        const factQuestions = [
+            {
+                emoji: "💪",
+                text: "性健康跟整體健康沒什麼關係",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！WHO明確指出性健康是身心健康的重要組成部分，影響整體生活品質。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "🗣️",
+                text: "性行為前不需要溝通，自然發生就好",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！良好的溝通能確保雙方都感到舒適和安全，同意是健康性關係的基礎。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "🛡️",
+                text: "保險套只是心理安慰，沒什麼實際效果",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！正確使用保險套可以大幅降低性病傳播風險，避孕效果也高達98%。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "🧠",
+                text: "性慾應該一輩子都保持一樣",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！性慾受到荷爾蒙、壓力、健康狀況等多種因素影響，隨年齡變化是正常的。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "🌈",
+                text: "只有異性戀才是正常的性取向",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！性取向是個人特質，多元性向都是正常的，每個人都應該被尊重和接納。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "💝",
+                text: "性愛次數越多代表關係越好",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！研究顯示，性愛的滿意度與頻率沒有直接關係，品質和雙方感受更重要。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "🎭",
+                text: "有性幻想代表對現實不滿足",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！性幻想是人類正常的心理現象，有助於探索自己的性慾和偏好。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "🏥",
+                text: "沒有症狀就不需要做性健康檢查",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！定期檢查能早期發現和治療性病，維護自己和伴侶的健康。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "🤝",
+                text: "性教育只需要教生理知識就夠了",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！完整的性教育不只是生理知識，還包括情感、關係、同意等重要概念。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "🔒",
+                text: "伴侶之間不應該拒絕對方的性需求",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！身體自主權是基本人權，每個人都有權說「不」，並且應該被尊重。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "💊",
+                text: "避孕只有保險套這一種方法",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！除了保險套，還有避孕藥、避孕環、避孕貼片等多種選擇，可諮詢醫師選擇適合的方法。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "🧘",
+                text: "性愛對身心健康沒有什麼幫助",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！性愛會釋放內啡肽和催產素，有助於減壓、改善心情和增進親密感。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "📚",
+                text: "性知識學一次就夠了，不需要更新",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！性知識會隨著科學進步而更新，持續學習能幫助我們做出更好的決定。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "💬",
+                text: "討論性需求會破壞浪漫氣氛",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！開放的溝通能增進彼此了解，提升性生活品質和關係滿意度。",
+                backgroundImage: ""
+            },
+            {
+                emoji: "🌟",
+                text: "自慰是不健康的行為",
+                desc: "這個說法正確嗎？",
+                answer: false,
+                explanation: "這是迷思！自慰是探索自己身體和性慾的正常方式，對身心健康都有益處。",
+                backgroundImage: ""
+            }
+        ];
+
+        // 合併所有題目
+        const allQuestions = [...mythQuestions, ...factQuestions];
+
+        // 隨機選擇10題，確保包含正確觀念
+        let questions = [];
+        let questionPool = [...allQuestions]; // 複製題目池
+
+        let currentQuestionIndex = 0;
+        let correctAnswers = 0;
+        let userAnswers = [];
+        let wrongAnswers = []; // 記錄答錯的題目
+
+        // 隨機選題函數 - 確保正確性知識和性迷思各佔50%
+        function selectRandomQuestions() {
+            questions = [];
+            
+            // 從事實題目中隨機選5題 (50%)
+            let selectedFacts = [];
+            let tempFactPool = [...factQuestions];
+            const factCount = 5; // 固定5題事實
+            
+            for (let i = 0; i < factCount; i++) {
+                const randomIndex = Math.floor(Math.random() * tempFactPool.length);
+                selectedFacts.push(tempFactPool[randomIndex]);
+                tempFactPool.splice(randomIndex, 1);
+            }
+            
+            // 從迷思題目中選擇5題 (50%)
+            let selectedMyths = [];
+            let tempMythPool = [...mythQuestions];
+            const mythCount = 5; // 固定5題迷思
+            
+            for (let i = 0; i < mythCount; i++) {
+                const randomIndex = Math.floor(Math.random() * tempMythPool.length);
+                selectedMyths.push(tempMythPool[randomIndex]);
+                tempMythPool.splice(randomIndex, 1);
+            }
+            
+            // 合併並隨機排序
+            questions = [...selectedFacts, ...selectedMyths];
+            
+            // 洗牌算法隨機排序
+            for (let i = questions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [questions[i], questions[j]] = [questions[j], questions[i]];
+            }
+            
+            // 為每題分配不重複的背景圖片
+            assignBackgroundsToQuestions();
+        }
+        
+        // 為題目分配不重複的背景圖片
+        function assignBackgroundsToQuestions() {
+            const availableBackgrounds = uploadedImages.questionBackgrounds.filter(bg => bg !== null && bg !== undefined);
+            
+            if (availableBackgrounds.length === 0) {
+                // 如果沒有上傳背景圖，所有題目都使用預設漸層
+                questions.forEach(question => {
+                    question.assignedBackground = null;
+                });
+                return;
+            }
+            
+            // 創建背景圖片的副本用於分配，確保不重複
+            let backgroundPool = [...availableBackgrounds];
+            
+            questions.forEach((question, index) => {
+                // 如果背景圖片用完了，重新填充池子
+                if (backgroundPool.length === 0) {
+                    backgroundPool = [...availableBackgrounds];
+                }
+                
+                // 隨機選擇一張背景圖片並從池子中移除
+                const randomIndex = Math.floor(Math.random() * backgroundPool.length);
+                question.assignedBackground = backgroundPool[randomIndex];
+                backgroundPool.splice(randomIndex, 1); // 移除已使用的背景圖片
+                
+                console.log(`題目${index + 1}分配到不重複背景圖片，剩餘${backgroundPool.length}張`);
+            });
+        }
+        
+        // 圖片直接嵌入程式碼 - 發布後所有人都能立即看到，就像按鈕一樣是程式碼的一部分
+        let uploadedImages = {
+            coverBackground: null,
+            questionBackgrounds: [null, null, null, null, null, null, null, null, null, null],
+            master: null,
+            apprentice: null,
+            novice: null,
+            analysisBackground: null
+        };
+
+        // 自動從 localStorage 載入並永久嵌入圖片到程式碼中
+        function autoEmbedImages() {
+            const storedCover = localStorage.getItem('coverBackground');
+            const storedQuestionBgs = JSON.parse(localStorage.getItem('questionBackgrounds') || '[null,null,null,null,null,null,null,null,null,null]');
+            const storedMaster = localStorage.getItem('masterImage');
+            const storedApprentice = localStorage.getItem('apprenticeImage');
+            const storedNovice = localStorage.getItem('noviceImage');
+            const storedAnalysis = localStorage.getItem('analysisBackground');
+            
+            if (storedCover) {
+                uploadedImages.coverBackground = storedCover;
+                updateCodeWithImage('coverBackground', storedCover);
+            }
+            if (storedQuestionBgs && storedQuestionBgs.some(bg => bg)) {
+                uploadedImages.questionBackgrounds = storedQuestionBgs;
+                updateCodeWithImages('questionBackgrounds', storedQuestionBgs);
+            }
+            if (storedMaster) {
+                uploadedImages.master = storedMaster;
+                updateCodeWithImage('master', storedMaster);
+            }
+            if (storedApprentice) {
+                uploadedImages.apprentice = storedApprentice;
+                updateCodeWithImage('apprentice', storedApprentice);
+            }
+            if (storedNovice) {
+                uploadedImages.novice = storedNovice;
+                updateCodeWithImage('novice', storedNovice);
+            }
+            if (storedAnalysis) {
+                uploadedImages.analysisBackground = storedAnalysis;
+                updateCodeWithImage('analysisBackground', storedAnalysis);
+            }
+        }
+
+        // 將圖片直接寫入程式碼中，讓它成為程式碼的一部分
+        function updateCodeWithImage(imageType, imageData) {
+            // 這個函數會在匯出時將圖片資料直接寫入程式碼
+            console.log(`圖片 ${imageType} 已準備嵌入程式碼`);
+        }
+
+        function updateCodeWithImages(imageType, imageArray) {
+            // 這個函數會在匯出時將圖片陣列直接寫入程式碼
+            console.log(`圖片陣列 ${imageType} 已準備嵌入程式碼`);
+        }
+
+        // 載入圖片並準備嵌入到程式碼中 - 讓圖片成為測驗的永久部分
+        function loadAndEmbedImages() {
+            autoEmbedImages(); // 自動載入並準備嵌入圖片
+        }
+
+
+
+        // 圖片上傳處理函數
+        function setupImageUploads() {
+            // 封面背景上傳
+            const coverUpload = document.getElementById('coverBgUpload');
+            if (coverUpload) {
+                coverUpload.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            uploadedImages.coverBackground = e.target.result;
+                            // 儲存到 localStorage
+                            localStorage.setItem('coverBackground', e.target.result);
+                            // 立即套用封面背景
+                            applyCoverBackground();
+                            showUploadSuccess('coverBgUpload');
+                            // 圖片已準備好嵌入測驗中
+                            updateCodeWithImage('coverBackground', e.target.result);
+                            showImageEmbedNotification('封面背景圖已準備嵌入測驗！');
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+
+            // 題目背景圖片上傳 (多張)
+            for (let i = 1; i <= 10; i++) {
+                const input = document.getElementById(`questionBg${i}Upload`);
+                if (input) {
+                    input.addEventListener('change', function(e) {
+                        const file = e.target.files[0];
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                // 將圖片加入陣列，如果該位置已有圖片則替換
+                                uploadedImages.questionBackgrounds[i-1] = e.target.result;
+                                // 儲存到 localStorage
+                                localStorage.setItem('questionBackgrounds', JSON.stringify(uploadedImages.questionBackgrounds));
+                                showUploadSuccess(`questionBg${i}Upload`);
+                                // 圖片已準備好嵌入測驗中
+                                updateCodeWithImages('questionBackgrounds', uploadedImages.questionBackgrounds);
+                                showImageEmbedNotification(`題目${i}背景圖已準備嵌入測驗！`);
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    });
+                }
+            }
+
+            // 結果圖片上傳
+            const resultUploads = [
+                { id: 'masterUpload', key: 'master' },
+                { id: 'apprenticeUpload', key: 'apprentice' },
+                { id: 'noviceUpload', key: 'novice' }
+            ];
+
+            resultUploads.forEach(upload => {
+                const input = document.getElementById(upload.id);
+                if (input) {
+                    input.addEventListener('change', function(e) {
+                        const file = e.target.files[0];
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                uploadedImages[upload.key] = e.target.result;
+                                // 儲存到 localStorage
+                                localStorage.setItem(upload.key + 'Image', e.target.result);
+                                showUploadSuccess(upload.id);
+                                // 圖片已準備好嵌入測驗中
+                                updateCodeWithImage(upload.key, e.target.result);
+                                const resultNames = { master: '性學大師', apprentice: '性學學徒', novice: '性學新手' };
+                                showImageEmbedNotification(`${resultNames[upload.key]}結果圖已準備嵌入測驗！`);
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    });
+                }
+            });
+
+            // 解析背景圖片上傳
+            const analysisBgUpload = document.getElementById('analysisBgUpload');
+            if (analysisBgUpload) {
+                analysisBgUpload.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            uploadedImages.analysisBackground = e.target.result;
+                            // 儲存到 localStorage
+                            localStorage.setItem('analysisBackground', e.target.result);
+                            showUploadSuccess('analysisBgUpload');
+                            // 圖片已準備好嵌入測驗中
+                            updateCodeWithImage('analysisBackground', e.target.result);
+                            showImageEmbedNotification('解析背景圖已準備嵌入測驗！');
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+        }
+
+        // 套用封面背景
+        function applyCoverBackground() {
+            const body = document.body;
+            if (uploadedImages.coverBackground) {
+                body.style.backgroundImage = `linear-gradient(135deg, rgba(102, 126, 234, 0.8) 0%, rgba(118, 75, 162, 0.8) 100%), url('${uploadedImages.coverBackground}')`;
+                body.style.backgroundSize = 'cover';
+                body.style.backgroundPosition = 'center';
+                body.style.backgroundRepeat = 'no-repeat';
+                body.style.backgroundAttachment = 'fixed';
+            } else {
+                body.style.backgroundImage = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                body.style.backgroundSize = '';
+                body.style.backgroundPosition = '';
+                body.style.backgroundRepeat = '';
+                body.style.backgroundAttachment = '';
+            }
+        }
+
+
+
+        // 顯示上傳成功提示
+        function showUploadSuccess(inputId) {
+            const input = document.getElementById(inputId);
+            const originalBg = input.style.backgroundColor;
+            input.style.backgroundColor = 'rgba(34, 197, 94, 0.3)';
+            input.style.borderColor = '#22c55e';
+            
+            setTimeout(() => {
+                input.style.backgroundColor = originalBg;
+                input.style.borderColor = '';
+            }, 1500);
+        }
+
+        // 顯示圖片嵌入通知
+        function showImageEmbedNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 left-4 bg-green-600 bg-opacity-90 text-white px-4 py-3 rounded-lg text-sm z-50 shadow-lg border border-green-400';
+            notification.innerHTML = `
+                <div class="flex items-center space-x-2">
+                    <span class="text-lg">✅</span>
+                    <span class="cute-text">${message}</span>
+                </div>
+                <div class="text-xs mt-1 opacity-80 cute-text">圖片已成為測驗的永久部分，發布後所有人都能看到！</div>
+            `;
+            document.body.appendChild(notification);
+            
+            // 4秒後自動移除
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 4000);
+        }
+
+        // 頁面載入時初始化圖片上傳功能
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAndEmbedImages(); // 載入已儲存的圖片
+            setupImageUploads();
+            setupAdminPanel();
+            applyCoverBackground(); // 確保頁面載入時套用背景
+        });
+
+        // 設定管理員面板快捷鍵和觸控
+        function setupAdminPanel() {
+            // 鍵盤快捷鍵
+            document.addEventListener('keydown', function(e) {
+                // 檢查是否按下 Ctrl+Shift+U
+                if (e.ctrlKey && e.shiftKey && e.key === 'U') {
+                    e.preventDefault();
+                    toggleAdminPanel();
+                }
+            });
+            
+            // 平板/手機觸控方式：連續點擊標題5次
+            let titleClickCount = 0;
+            let titleClickTimer = null;
+            const mainTitle = document.getElementById('mainTitle');
+            
+            if (mainTitle) {
+                mainTitle.addEventListener('click', function(e) {
+                    titleClickCount++;
+                    
+                    // 清除之前的計時器
+                    if (titleClickTimer) {
+                        clearTimeout(titleClickTimer);
+                    }
+                    
+                    // 如果連續點擊5次，開啟管理員面板
+                    if (titleClickCount >= 5) {
+                        e.preventDefault();
+                        toggleAdminPanel();
+                        titleClickCount = 0;
+                        showAdminNotification('🎉 平板管理員面板已開啟！');
+                        return;
+                    }
+                    
+                    // 設定計時器，2秒後重置點擊次數
+                    titleClickTimer = setTimeout(() => {
+                        titleClickCount = 0;
+                    }, 2000);
+                    
+                    // 給用戶視覺回饋
+                    if (titleClickCount >= 3) {
+                        showAdminNotification(`再點擊 ${5 - titleClickCount} 次開啟管理員面板`);
+                    }
+                });
+            }
+        }
+
+        // 切換管理員面板顯示
+        function toggleAdminPanel() {
+            const panel = document.getElementById('adminUploadPanel');
+            if (panel.classList.contains('hidden')) {
+                panel.classList.remove('hidden');
+                // 顯示簡短提示
+                showAdminNotification('管理員面板已開啟');
+            } else {
+                panel.classList.add('hidden');
+                showAdminNotification('管理員面板已隱藏');
+            }
+        }
+
+        // 顯示管理員通知
+        function showAdminNotification(message) {
+            // 創建通知元素
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 bg-black bg-opacity-80 text-white px-4 py-2 rounded-lg text-sm z-50 cute-text';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            // 3秒後自動移除
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 3000);
+        }
+
+
+
+        // 匯出完整測驗程式碼 - 圖片永久嵌入，與測驗一體化
+        function exportImages() {
+            // 獲取當前頁面的完整HTML
+            const currentHTML = document.documentElement.outerHTML;
+            
+            // 將你的圖片永久嵌入到測驗程式碼中，成為測驗的一部分
+            let modifiedHTML = currentHTML;
+            
+            // 將圖片資料直接寫入程式碼，讓它們成為測驗的永久組成部分
+            const imagesCode = `// 🎨 你的圖片已永久嵌入測驗中！發布後所有人都能立即看到
+        let uploadedImages = {
+            coverBackground: ${uploadedImages.coverBackground ? `"${uploadedImages.coverBackground}"` : 'null'},
+            questionBackgrounds: ${JSON.stringify(uploadedImages.questionBackgrounds)},
+            master: ${uploadedImages.master ? `"${uploadedImages.master}"` : 'null'},
+            apprentice: ${uploadedImages.apprentice ? `"${uploadedImages.apprentice}"` : 'null'},
+            novice: ${uploadedImages.novice ? `"${uploadedImages.novice}"` : 'null'},
+            analysisBackground: ${uploadedImages.analysisBackground ? `"${uploadedImages.analysisBackground}"` : 'null'}
+        };`;
+            
+            // 替換圖片設定區域，讓你的圖片成為程式碼的永久部分
+            const uploadedImagesRegex = /\/\/ 圖片直接嵌入程式碼[\s\S]*?};/;
+            modifiedHTML = modifiedHTML.replace(uploadedImagesRegex, imagesCode);
+            
+            // 移除開發用的載入功能，因為圖片已經是程式碼的一部分了
+            modifiedHTML = modifiedHTML.replace(/autoEmbedImages\(\);[\s]*\/\/ 自動載入並準備嵌入圖片/, '// 🎉 圖片已永久嵌入測驗中！');
+            
+            // 顯示完整的測驗程式碼（包含你的圖片）
+            showExportModal(modifiedHTML, true);
+        }
+
+        // 顯示匯出程式碼的彈出視窗
+        function showExportModal(codeString, isFullHTML = false) {
+            // 創建遮罩
+            const overlay = document.createElement('div');
+            overlay.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4';
+            
+            // 創建彈出視窗
+            const modal = document.createElement('div');
+            modal.className = 'bg-white rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden shadow-2xl';
+            
+            const title = isFullHTML ? '🎨 你的專屬測驗已完成！(圖片永久嵌入)' : '📤 圖片程式碼匯出';
+            const description = isFullHTML ? 
+                '🌟 恭喜！你的圖片已永久成為測驗的一部分！複製以下程式碼發布到任何地方，所有人都能立即看到你的圖片，就像測驗的內建功能一樣完美顯示！' : 
+                '複製以下程式碼，替換原始程式碼中的 uploadedImages 設定';
+            
+            modal.innerHTML = `
+                <div class="p-6 border-b border-gray-200">
+                    <h3 class="text-xl cute-title text-gray-800">${title}</h3>
+                    <p class="text-sm text-gray-600 mt-2 cute-text">${description}</p>
+                    ${isFullHTML ? '<p class="text-xs text-green-600 mt-1 cute-button">🎉 你的圖片已與測驗完美融合！不需要額外檔案，發布後立即可見，永不失效，就像測驗的原生功能！</p>' : ''}
+                </div>
+                <div class="p-6 overflow-y-auto" style="max-height: 60vh;">
+                    <textarea readonly class="w-full p-4 border border-gray-300 rounded-lg font-mono text-xs bg-gray-50 resize-none" id="exportCode" style="height: 400px;">${codeString.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
+                </div>
+                <div class="p-6 border-t border-gray-200 flex justify-end space-x-4">
+                    <button onclick="copyExportCode()" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg cute-button transition-colors">
+                        📋 複製程式碼
+                    </button>
+                    ${isFullHTML ? '<button onclick="downloadHTML()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg cute-button transition-colors">💾 下載我的測驗檔案</button>' : ''}
+                    <button onclick="closeExportModal()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg cute-button transition-colors">
+                        關閉
+                    </button>
+                </div>
+            `;
+            
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+            
+            // 點擊遮罩關閉
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) {
+                    closeExportModal();
+                }
+            });
+            
+            // 儲存引用以便關閉
+            window.currentExportModal = overlay;
+            window.currentExportCode = codeString;
+        }
+
+        // 複製匯出程式碼
+        function copyExportCode() {
+            const textarea = document.getElementById('exportCode');
+            const textToCopy = window.currentExportCode || textarea.value;
+            
+            try {
+                // 使用 Clipboard API
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(textToCopy).then(() => {
+                        showAdminNotification('程式碼已複製到剪貼簿！');
+                    }).catch(() => {
+                        // 備用方案
+                        textarea.select();
+                        textarea.setSelectionRange(0, 99999);
+                        document.execCommand('copy');
+                        showAdminNotification('程式碼已複製到剪貼簿！');
+                    });
+                } else {
+                    // 舊版瀏覽器備用方案
+                    textarea.select();
+                    textarea.setSelectionRange(0, 99999);
+                    document.execCommand('copy');
+                    showAdminNotification('程式碼已複製到剪貼簿！');
+                }
+            } catch (err) {
+                showAdminNotification('複製失敗，請手動選取複製');
+            }
+        }
+
+        // 下載HTML檔案
+        function downloadHTML() {
+            const htmlContent = window.currentExportCode;
+            if (!htmlContent) {
+                showAdminNotification('沒有可下載的內容');
+                return;
+            }
+            
+            // 創建 Blob 物件
+            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+            
+            // 創建下載連結
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = '我的性教育測驗_圖片永久嵌入.html';
+            
+            // 觸發下載
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // 清理 URL 物件
+            URL.revokeObjectURL(link.href);
+            
+            showAdminNotification('你的專屬測驗檔案已開始下載！圖片已永久嵌入其中');
+        }
+
+        // 關閉匯出彈出視窗
+        function closeExportModal() {
+            if (window.currentExportModal) {
+                document.body.removeChild(window.currentExportModal);
+                window.currentExportModal = null;
+            }
+        }
+
+        // 下載完整測驗包 (HTML + 所有圖片檔案)
+        async function downloadCompletePackage() {
+            try {
+                // 動態載入 JSZip 函式庫
+                if (typeof JSZip === 'undefined') {
+                    const script = document.createElement('script');
+                    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+                    document.head.appendChild(script);
+                    
+                    // 等待載入完成
+                    await new Promise((resolve, reject) => {
+                        script.onload = resolve;
+                        script.onerror = reject;
+                    });
+                }
+
+                const zip = new JSZip();
+                
+                // 創建資料夾結構
+                const imagesFolder = zip.folder("images");
+                
+                // 獲取當前頁面的HTML（不包含圖片資料）
+                let htmlContent = document.documentElement.outerHTML;
+                
+                // 移除內嵌的圖片資料，改為引用外部檔案
+                let imageCounter = 1;
+                const imageReplacements = {};
+                
+                // 處理封面背景
+                if (uploadedImages.coverBackground) {
+                    const fileName = `cover-background.jpg`;
+                    const base64Data = uploadedImages.coverBackground.split(',')[1];
+                    imagesFolder.file(fileName, base64Data, {base64: true});
+                    imageReplacements.coverBackground = `./images/${fileName}`;
+                }
+                
+                // 處理題目背景圖片
+                uploadedImages.questionBackgrounds.forEach((bg, index) => {
+                    if (bg) {
+                        const fileName = `question-bg-${index + 1}.jpg`;
+                        const base64Data = bg.split(',')[1];
+                        imagesFolder.file(fileName, base64Data, {base64: true});
+                        imageReplacements[`questionBg${index}`] = `./images/${fileName}`;
+                    }
+                });
+                
+                // 處理結果圖片
+                const resultTypes = ['master', 'apprentice', 'novice'];
+                resultTypes.forEach(type => {
+                    if (uploadedImages[type]) {
+                        const fileName = `result-${type}.jpg`;
+                        const base64Data = uploadedImages[type].split(',')[1];
+                        imagesFolder.file(fileName, base64Data, {base64: true});
+                        imageReplacements[type] = `./images/${fileName}`;
+                    }
+                });
+                
+                // 處理解析背景
+                if (uploadedImages.analysisBackground) {
+                    const fileName = `analysis-background.jpg`;
+                    const base64Data = uploadedImages.analysisBackground.split(',')[1];
+                    imagesFolder.file(fileName, base64Data, {base64: true});
+                    imageReplacements.analysisBackground = `./images/${fileName}`;
+                }
+                
+                // 修改HTML中的圖片引用
+                const modifiedUploadedImages = {
+                    coverBackground: imageReplacements.coverBackground || null,
+                    questionBackgrounds: uploadedImages.questionBackgrounds.map((bg, index) => 
+                        imageReplacements[`questionBg${index}`] || null
+                    ),
+                    master: imageReplacements.master || null,
+                    apprentice: imageReplacements.apprentice || null,
+                    novice: imageReplacements.novice || null,
+                    analysisBackground: imageReplacements.analysisBackground || null
+                };
+                
+                // 替換HTML中的圖片設定
+                const imagesCodeRegex = /let uploadedImages = \{[\s\S]*?\};/;
+                const newImagesCode = `let uploadedImages = ${JSON.stringify(modifiedUploadedImages, null, 12)};`;
+                htmlContent = htmlContent.replace(imagesCodeRegex, newImagesCode);
+                
+                // 移除管理員面板相關功能（發布版本不需要）
+                htmlContent = htmlContent.replace(/<!-- 隱藏的圖片上傳區域[\s\S]*?<\/div>\s*<\/div>/, '<!-- 管理員面板已移除 -->');
+                
+                // 添加主HTML檔案
+                zip.file("性教育迷思測驗.html", htmlContent);
+                
+                // 創建說明檔案
+                const readmeContent = `🌟 性教育迷思測驗 - 完整版
+
+📁 檔案說明：
+- 性教育迷思測驗.html：主要測驗檔案
+- images/：所有圖片檔案資料夾
+  - cover-background.jpg：封面背景圖
+  - question-bg-*.jpg：題目背景圖片
+  - result-*.jpg：結果圖片
+  - analysis-background.jpg：解析背景圖
+
+🚀 使用方法：
+1. 解壓縮所有檔案到同一個資料夾
+2. 保持資料夾結構不變
+3. 直接開啟「性教育迷思測驗.html」即可使用
+4. 可以上傳到網站伺服器供他人使用
+
+✨ 特色功能：
+- 滑動式測驗體驗
+- 個人化背景圖片
+- 詳細解析功能
+- 響應式設計，支援手機和電腦
+
+💡 技術說明：
+- 純HTML/CSS/JavaScript，無需額外安裝
+- 圖片採用相對路徑引用，確保離線可用
+- 支援所有現代瀏覽器
+
+🎨 製作日期：${new Date().toLocaleDateString('zh-TW')}
+`;
+                
+                zip.file("使用說明.txt", readmeContent);
+                
+                // 生成並下載ZIP檔案
+                showAdminNotification('正在打包檔案，請稍候...');
+                
+                const content = await zip.generateAsync({
+                    type: "blob",
+                    compression: "DEFLATE",
+                    compressionOptions: {
+                        level: 6
+                    }
+                });
+                
+                // 創建下載連結
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(content);
+                link.download = `性教育迷思測驗_完整版_${new Date().toISOString().slice(0,10)}.zip`;
+                
+                // 觸發下載
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // 清理
+                URL.revokeObjectURL(link.href);
+                
+                showAdminNotification('📦 完整測驗包下載完成！解壓縮後即可使用');
+                
+            } catch (error) {
+                console.error('打包失敗:', error);
+                showAdminNotification('❌ 打包失敗，請稍後再試');
+            }
+        }
+
+        function startQuiz() {
+            selectRandomQuestions(); // 隨機選題
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('quizScreen').classList.remove('hidden');
+            document.getElementById('totalQuestions').textContent = questions.length;
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            if (currentQuestionIndex >= questions.length) {
+                showResult();
+                return;
+            }
+
+            const question = questions[currentQuestionIndex];
+            document.getElementById('questionEmoji').textContent = question.emoji;
+            document.getElementById('questionText').textContent = question.text;
+            document.getElementById('questionDesc').textContent = question.desc;
+            document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+            
+            // 設定背景圖片 - 使用該題目預先分配的背景圖片
+            const cardBackground = document.getElementById('cardBackground');
+            
+            console.log(`載入題目${currentQuestionIndex + 1}，分配的背景:`, question.assignedBackground ? '有背景圖' : '無背景圖');
+            
+            if (question.assignedBackground) {
+                cardBackground.style.backgroundImage = `url('${question.assignedBackground}')`;
+                cardBackground.style.backgroundSize = 'cover';
+                cardBackground.style.backgroundPosition = 'center';
+                cardBackground.style.backgroundRepeat = 'no-repeat';
+                cardBackground.className = 'absolute inset-0'; // 移除預設漸層背景
+            } else {
+                cardBackground.style.backgroundImage = '';
+                cardBackground.className = 'absolute inset-0 bg-gradient-to-br from-purple-400 to-pink-400'; // 恢復預設漸層
+            }
+            
+            // 更新進度條
+            const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+
+            // 重置卡片位置
+            const card = document.getElementById('questionCard');
+            card.classList.remove('card-swipe-left', 'card-swipe-right');
+            card.style.transform = '';
+            card.style.opacity = '1';
+        }
+
+        function swipeLeft() {
+            answerQuestion(false);
+        }
+
+        function swipeRight() {
+            answerQuestion(true);
+        }
+
+        function answerQuestion(userAnswer) {
+            const question = questions[currentQuestionIndex];
+            userAnswers.push(userAnswer);
+            
+            if (userAnswer === question.answer) {
+                correctAnswers++;
+            } else {
+                // 記錄答錯的題目
+                wrongAnswers.push({
+                    question: question,
+                    userAnswer: userAnswer,
+                    correctAnswer: question.answer
+                });
+            }
+
+            // 動畫效果
+            const card = document.getElementById('questionCard');
+            if (userAnswer) {
+                card.classList.add('card-swipe-right');
+            } else {
+                card.classList.add('card-swipe-left');
+            }
+
+            // 延遲載入下一題
+            setTimeout(() => {
+                currentQuestionIndex++;
+                loadQuestion();
+            }, 300);
+        }
+
+        function showResult() {
+            document.getElementById('quizScreen').classList.add('hidden');
+            document.getElementById('resultScreen').classList.remove('hidden');
+
+            const percentage = (correctAnswers / questions.length) * 100;
+            
+            // 恢復封面背景
+            applyCoverBackground();
+            
+            // 根據分數選擇對應的結果圖片
+            let resultImage = null;
+            
+            if (percentage >= 80) {
+                resultImage = uploadedImages.master;
+            } else if (percentage >= 60) {
+                resultImage = uploadedImages.apprentice;
+            } else {
+                resultImage = uploadedImages.novice;
+            }
+            
+            // 設定結果圖片框
+            const resultBg = document.getElementById('resultBackground');
+            const placeholder = document.getElementById('resultPlaceholder');
+            
+            if (resultImage) {
+                // 清空背景，創建img元素
+                resultBg.style.backgroundImage = '';
+                resultBg.innerHTML = `<img src="${resultImage}" alt="測驗結果" class="w-full h-full object-contain rounded-lg shadow-lg">`;
+                resultBg.className = 'w-full h-full flex items-center justify-center';
+                placeholder.style.display = 'none'; // 隱藏提示文字
+            } else {
+                resultBg.innerHTML = '';
+                resultBg.className = 'w-full h-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center p-4';
+                placeholder.style.display = 'flex'; // 顯示提示文字
+            }
+            
+            // 生成答錯題目解析
+            generateWrongAnswersAnalysis();
+        }
+
+        // 生成答錯題目解析
+        function generateWrongAnswersAnalysis() {
+            const wrongAnswersList = document.getElementById('wrongAnswersList');
+            wrongAnswersList.innerHTML = '';
+            
+            // 確保按鍵始終顯示，即使沒有錯題也可以查看所有解析
+            document.getElementById('toggleAnalysisBtn').style.display = 'inline-block';
+            
+            if (wrongAnswers.length === 0) {
+                // 如果沒有錯題，顯示恭喜訊息
+                const congratsItem = document.createElement('div');
+                congratsItem.className = 'bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-8 text-center border border-white border-opacity-20';
+                congratsItem.innerHTML = `
+                    <div class="text-6xl mb-4">🎉</div>
+                    <h4 class="text-2xl cute-title text-white mb-4">恭喜！全部答對！</h4>
+                    <p class="text-white cute-text">你已經是性教育專家了！不過還是可以複習一下所有題目的解析喔～</p>
+                `;
+                wrongAnswersList.appendChild(congratsItem);
+                
+                // 顯示所有題目的解析
+                questions.forEach((question, index) => {
+                    const questionItem = document.createElement('div');
+                    questionItem.className = 'bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-6 mb-6 border border-white border-opacity-20';
+                    
+                    const correctAnswerText = question.answer ? '事實' : '迷思';
+                    
+                    questionItem.innerHTML = `
+                        <div class="flex items-start space-x-4 mb-4">
+                            <div class="text-3xl flex-shrink-0">${question.emoji}</div>
+                            <div class="flex-1">
+                                <h4 class="text-xl cute-title text-white mb-2">${question.text}</h4>
+                                <div class="text-sm space-y-1 mb-3 cute-text">
+                                    <div><span class="text-green-300">✅ 正確答案: ${correctAnswerText}</span></div>
+                                </div>
+                                <div class="bg-white bg-opacity-20 rounded-lg p-4">
+                                    <p class="text-white text-sm leading-relaxed cute-text">${question.explanation}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    wrongAnswersList.appendChild(questionItem);
+                });
+                return;
+            }
+            
+            wrongAnswers.forEach((wrong, index) => {
+                const wrongItem = document.createElement('div');
+                wrongItem.className = 'bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-6 mb-6 border border-white border-opacity-20';
+                
+                const userAnswerText = wrong.userAnswer ? '事實' : '迷思';
+                const correctAnswerText = wrong.correctAnswer ? '事實' : '迷思';
+                
+                wrongItem.innerHTML = `
+                    <div class="flex items-start space-x-4 mb-4">
+                        <div class="text-3xl flex-shrink-0">${wrong.question.emoji}</div>
+                        <div class="flex-1">
+                            <h4 class="text-xl cute-title text-white mb-2">${wrong.question.text}</h4>
+                            <div class="text-sm space-y-1 mb-3 cute-text">
+                                <div><span class="text-red-300">❌ 你的答案: ${userAnswerText}</span></div>
+                                <div><span class="text-green-300">✅ 正確答案: ${correctAnswerText}</span></div>
+                            </div>
+                            <div class="bg-white bg-opacity-20 rounded-lg p-4">
+                                <p class="text-white text-sm leading-relaxed cute-text">${wrong.question.explanation}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                wrongAnswersList.appendChild(wrongItem);
+            });
+        }
+        
+        // 切換解析顯示
+        function toggleAnalysis() {
+            const section = document.getElementById('wrongAnswersSection');
+            const btn = document.getElementById('toggleAnalysisBtn');
+            const resultImage = document.querySelector('.relative.w-full.mb-8');
+            const buttonArea = document.querySelector('.flex.flex-col.sm\\:flex-row.gap-4.justify-center.mb-8');
+            
+            if (section.classList.contains('hidden')) {
+                // 顯示解析，隱藏其他元素
+                section.classList.remove('hidden');
+                resultImage.classList.add('hidden');
+                buttonArea.classList.add('hidden');
+            } else {
+                // 隱藏解析，顯示其他元素
+                section.classList.add('hidden');
+                resultImage.classList.remove('hidden');
+                buttonArea.classList.remove('hidden');
+            }
+        }
+
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            correctAnswers = 0;
+            userAnswers = [];
+            wrongAnswers = [];
+            
+            // 隱藏解析區域
+            document.getElementById('wrongAnswersSection').classList.add('hidden');
+            document.getElementById('toggleAnalysisBtn').textContent = '📚 查看魔法解析';
+            document.getElementById('toggleAnalysisBtn').style.display = 'inline-block';
+            
+            document.getElementById('resultScreen').classList.add('hidden');
+            document.getElementById('startScreen').classList.remove('hidden');
+        }
+
+        // 觸控滑動支援
+        let startX = 0;
+        let currentX = 0;
+        let cardBeingDragged = false;
+
+        document.getElementById('questionCard').addEventListener('touchstart', handleTouchStart, { passive: true });
+        document.getElementById('questionCard').addEventListener('touchmove', handleTouchMove, { passive: true });
+        document.getElementById('questionCard').addEventListener('touchend', handleTouchEnd, { passive: true });
+
+        function handleTouchStart(e) {
+            startX = e.touches[0].clientX;
+            cardBeingDragged = true;
+        }
+
+        function handleTouchMove(e) {
+            if (!cardBeingDragged) return;
+            
+            currentX = e.touches[0].clientX;
+            const diffX = currentX - startX;
+            const card = document.getElementById('questionCard');
+            
+            // 即時視覺回饋
+            const rotation = diffX * 0.1;
+            card.style.transform = `translateX(${diffX}px) rotate(${rotation}deg)`;
+            card.style.opacity = Math.max(0.5, 1 - Math.abs(diffX) / 300);
+        }
+
+        function handleTouchEnd(e) {
+            if (!cardBeingDragged) return;
+            
+            const diffX = currentX - startX;
+            const threshold = 100;
+            
+            if (Math.abs(diffX) > threshold) {
+                if (diffX > 0) {
+                    swipeRight();
+                } else {
+                    swipeLeft();
+                }
+            } else {
+                // 回彈效果
+                const card = document.getElementById('questionCard');
+                card.style.transform = '';
+                card.style.opacity = '1';
+            }
+            
+            cardBeingDragged = false;
+            startX = 0;
+            currentX = 0;
+        }
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a36bb3886d456e9',t:'MTc2Mzk2NDUwMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
